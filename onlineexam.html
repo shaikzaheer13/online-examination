@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>onlineexam</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .container {
+            width: 50%;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input[type="text"], input[type="password"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .question {
+            margin-bottom: 15px;
+        }
+        #exam,#result {
+            display: none;
+        }
+        </style>
+</head>
+<body>
+    <h1> ONLINE EXAMINATION </h1>
+    <div class="container" id="login">
+        <h2> student login</h2>
+        <input type="text" placeholder="username" id="username">
+        <input type="password" placeholder="password" id="password">
+        <button onclick="login()">Login</button>
+        <small>username:student | password:12345678</small>
+        
+    </div>
+    <div class="container" id="exam">
+        <h2>computer networks&security</h2>
+        <p> time remaining: <span id="timer">5:00</span>minutes</p>
+        <form id="quiz">
+            <div class="question">
+                <p>1. What is the main purpose of a firewall in network security?</p>
+                <input type="radio" name="q1" value="a"> a) To encrypt data<br>
+                <input type="radio" name="q1" value="b"> b) To monitor network traffic<br>
+                <input type="radio" name="q1" value="c"> c) To block unauthorized access<br>
+                <input type="radio" name="q1" value="d"> d) To provide wireless connectivity<br>
+            </div>
+
+            <div class="question">
+                <p>2. Which protocol is commonly used for secure communication over the internet?</p>
+                <input type="radio" name="q2" value="a"> a) HTTP<br>
+                <input type="radio" name="q2" value="b"> b) FTP<br>
+                <input type="radio" name="q2" value="c"> c) HTTPS<br>
+                <input type="radio" name="q2" value="d"> d) SMTP<br>
+            </div>  
+            <div class="question">
+                <p>3. What is the purpose of a VPN (Virtual Private Network)?</p>
+                <input type="radio" name="q3" value="a"> a) To increase internet speed<br>
+                <input type="radio" name="q3" value="b"> b) To provide secure remote access<br>
+                <input type="radio" name="q3" value="c"> c) To block malware<br>
+                <input type="radio" name="q3" value="d"> d) To manage network devices<br>
+            </div>
+            <div class="question">
+                <p>4. Which of the following is a common method of authentication?</p>
+                <input type="radio" name="q4" value="a"> a) Passwords<br>
+                <input type="radio" name="q4" value="b"> b) Biometrics<br>
+                <input type="radio" name="q4" value="c"> c) Two-factor authentication<br>
+                <input type="radio" name="q4" value="d"> d) All of the above<br>    
+            </div>
+            <div class="question">
+                <p>5. What is the purpose of encryption in network security?</p>
+                <input type="radio" name="q5" value="a"> a) To compress data<br>
+                <input type="radio" name="q5" value="b"> b) To convert data into a secure format<br>
+                <input type="radio" name="q5" value="c"> c) To increase network speed<br>
+                <input type="radio" name="q5" value="d"> d) To block unauthorized access<br>
+            </div>
+        </form>
+            <button type="button"   onclick="submitExam()">Submit</button>
+    </div><div class="container" id="result">
+                <h2>Result</h2>
+                <h3 id="student"></h3>
+                <h1 id="score"></h1>
+                <p id ="correct"></p>
+                <p id="wrong"></p>
+                <p id="unanswered"></p>
+                <button onclick="location.reload()">back to login</button>
+
+            </div>    
+            <script>
+                let studentName = "";
+                let  time=300;
+                let timerInterval;
+                let submitted = false;
+                function login(){
+                    let username = document.getElementById("username").value;
+                    let password = document.getElementById("password").value;
+                    if(username === "student" && password === "12345678"){
+                        studentName = username;
+                        document.getElementById("login").style.display = "none";
+                        document.getElementById("exam").style.display = "block";
+                        startTimer();
+                    } else {
+                        alert("Invalid username or password");
+                    }
+                }
+                    function startTimer() {
+                        timerInterval = setInterval(function() {
+                            let minutes = Math.floor(time / 60);
+                            let seconds = time % 60;
+                            document.getElementById("timer").textContent = minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+                        
+                            if (time <=0) {
+                               submitExam();
+
+                            }else{
+                                time--;
+
+                            }
+                        }, 1000);
+                    }
+                    function submitExam() {
+                        if (submitted) return; 
+                        submitted = true;
+                        clearInterval(timerInterval);
+                        let score = 0;
+                        let correctAnswers = 0;
+                        let wrongAnswers = 0;
+                        let unanswered = 0;
+
+                        const answers = {
+                            q1: "c",
+                            q2: "c",
+                            q3: "b",
+                            q4: "d",
+                            q5: "b"
+                        };
+
+                        for (let i = 1; i <= 5; i++) {
+                            const selectedAnswer = document.querySelector(`input[name="q${i}"]:checked`);
+                            if (selectedAnswer) {
+                                if (selectedAnswer.value === answers[`q${i}`]) {
+                                    score += 20;
+                                    correctAnswers++;
+                                } else {
+                                    wrongAnswers++;
+                                }
+                            } else {
+                                unanswered++;
+                            }
+                        }
+
+                        document.getElementById("student").textContent = `Student: ${studentName}`;
+                        document.getElementById("score").textContent = `Score: ${score}`;
+                        document.getElementById("correct").textContent = `Correct Answers: ${correctAnswers}`;
+                        document.getElementById("wrong").textContent = `Wrong Answers: ${wrongAnswers}`;
+                        document.getElementById("unanswered").textContent = `Unanswered Questions: ${unanswered}`;
+
+                        document.getElementById("exam").style.display = "none";
+                        document.getElementById("result").style.display = "block";
+                    }
+                
+
+            </script>
+       
+    </div>
+</body>
+</html>
